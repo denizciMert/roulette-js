@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Denizci Roulette</title>
+    <style>
+        body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    font-family: Arial, sans-serif;
+    background-color: #46250e;
+}
+canvas {
+    max-width: 100%;
+    height: auto;
+    border: none;
+}
+#winnerBox ,#winnerBox2{
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    grid-template-columns: repeat(auto-fill, minmax(15px, 1fr));
+    grid-gap: 15px;
+    padding-bottom: 25px;
+    font-size: 20px;
+}
+button {
+    width: 150px;
+    height: 50px;
+    border-radius: 5%;
+    background-color: #1c1c1c;
+    color: #fff;
+    border: none;
+    margin: 5px;
+    cursor: pointer;
+    border: 1px solid #ffd700;
+}
+.buttons1 {
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    grid-template-columns: repeat(auto-fill, minmax(15px, 1fr));
+    grid-gap: 15px;
+}
+.buttons2{
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    grid-template-columns: repeat(auto-fill, minmax(15px, 1fr));
+    grid-gap: 15px;
+}
+#winnerList{
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    grid-template-columns: repeat(auto-fill, minmax(15px, 1fr));
+    grid-gap: 15px;
+    font-size: 25px;
+    
+}
+.Green{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #008b00;
+    margin: 1px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    border: 1px solid #ffd700;
+}
+.Black{
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: #1c1c1c;
+    margin: 1px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    border: 1px solid #ffd700;
+}
+.Red{
+    width: 50px; 
+    height: 50px;
+    border-radius: 50%;
+    background-color: #ee2c2c;
+    margin: 1px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    border: 2px, white ,solid;
+    border: 1px solid #ffd700;
+}
+@media only screen and (max-width: 600px) {
+    canvas {
+        width: 90%;
+    }
+    button {
+        width: 90%;
+    }
+}
+    </style>
+  </head>
+  <body>
+    <div>
+        <div id="winnerList"></div>
+        <canvas
+          id="myCanvas"
+          width="800"
+          height="800"
+          
+        ></canvas>
+        <div id="winnerBox"></div>
+        <div id="winnerBox2"></div>
+        <div class="buttons1">
+            <button onclick="rotateWheel()">Spin The Wheel</button>
+            <button onclick="randomPosition()">Randomize The Wheel</button>
+        </div>
+        <div class="buttons2">
+            <button onclick="resetWheel()">Reset The Wheel</button>
+            <button onclick="clearWinnerList()">Clear Winner List</button>
+        </div>
+    </div>
+    <script>
+      var canvas = document.getElementById("myCanvas");
+      var winnerBox = document.getElementById("winnerBox");
+      var winnerBox2 = document.getElementById("winnerBox2");
+      var winnerList = document.getElementById("winnerList");
+      var context = canvas.getContext("2d");
+      const numbers = [
+        { value: "0", type: "Even", color: "Green", half: "None", line: "None", part: "None" },
+        { value: "32", type: "Even", color: "Red", half: "19-36", line: "Line 2", part: "3rd 12" },
+        { value: "15", type: "Odd", color: "Black", half: "1-18", line: "Line 3", part: "2nd 12" },
+        { value: "19", type: "Odd", color: "Red", half: "19-36", line: "Line 1", part: "2nd 12" },
+        { value: "4", type: "Even", color: "Black", half: "1-18", line: "Line 1", part: "1st 12" },
+        { value: "21", type: "Odd", color: "Red", half: "19-36", line: "Line 3", part: "2nd 12" },
+        { value: "2", type: "Even", color: "Black", half: "1-18", line: "Line 2", part: "1st 12" },
+        { value: "25", type: "Odd", color: "Red", half: "19-36", line: "Line 1", part: "3rd 12" },
+        { value: "17", type: "Odd", color: "Black", half: "1-18", line: "Line 2", part: "2nd 12" },
+        { value: "34", type: "Even", color: "Red", half: "19-36", line: "Line 1", part: "3rd 12" },
+        { value: "6", type: "Even", color: "Black", half: "1-18", line: "Line 3", part: "1st 12" },
+        { value: "27", type: "Odd", color: "Red", half: "19-36", line: "Line 3", part: "3rd 12" },
+        { value: "13", type: "Odd", color: "Black", half: "1-18", line: "Line 1", part: "2nd 12" },
+        { value: "36", type: "Even", color: "Red", half: "19-36", line: "Line 3", part: "3rd 12" },
+        { value: "11", type: "Odd", color: "Black", half: "1-18", line: "Line 2", part: "1st 12" },
+        { value: "30", type: "Even", color: "Red", half: "19-36", line: "Line 3", part: "3rd 12" },
+        { value: "8", type: "Even", color: "Black", half: "1-18", line: "Line 2", part: "1st 12" },
+        { value: "23", type: "Odd", color: "Red", half: "19-36", line: "Line 2", part: "2nd 12" },
+        { value: "10", type: "Even", color: "Black", half: "1-18", line: "Line 1", part: "1st 12" },
+        { value: "5", type: "Odd", color: "Red", half: "1-18", line: "Line 2", part: "1st 12" },
+        { value: "24", type: "Even", color: "Black", half: "19-36", line: "Line 3", part: "2nd 12" },
+        { value: "16", type: "Even", color: "Red", half: "1-18", line: "Line 1", part: "2nd 12" },
+        { value: "33", type: "Odd", color: "Black", half: "19-36", line: "Line 3", part: "3rd 12" },
+        { value: "1", type: "Odd", color: "Red", half: "1-18", line: "Line 1", part: "1st 12" },
+        { value: "20", type: "Even", color: "Black", half: "19-36", line: "Line 2", part: "2nd 12" },
+        { value: "14", type: "Even", color: "Red", half: "1-18", line: "Line 2", part: "2nd 12" },
+        { value: "31", type: "Odd", color: "Black", half: "19-36", line: "Line 1", part: "3rd 12" },
+        { value: "9", type: "Odd", color: "Red", half: "1-18", line: "Line 3", part: "1st 12" },
+        { value: "22", type: "Even", color: "Black", half: "19-36", line: "Line 1", part: "2nd 12" },
+        { value: "18", type: "Even", color: "Red", half: "1-18", line: "Line 3", part: "2nd 12" },
+        { value: "29", type: "Odd", color: "Black", half: "19-36", line: "Line 2", part: "3rd 12" },
+        { value: "7", type: "Odd", color: "Red", half: "1-18", line: "Line 1", part: "1st 12" },
+        { value: "28", type: "Even", color: "Black", half: "19-36", line: "Line 1", part: "3rd 12" },
+        { value: "12", type: "Even", color: "Red", half: "1-18", line: "Line 3", part: "1st 12" },
+        { value: "35", type: "Odd", color: "Black", half: "19-36", line: "Line 2", part: "3rd 12" },
+        { value: "3", type: "Odd", color: "Red", half: "1-18", line: "Line 3", part: "1st 12" },
+        { value: "26", type: "Even", color: "Black", half: "19-36", line: "Line 2", part: "3rd 12" },
+      ];
+      var centerX = canvas.width / 2;
+      var centerY = canvas.height / 2;
+      var radius = 300;
+      var sliceCount = numbers.length;
+      var rotated = 0;
+      var new_position = 0;
+      var index = 0;
+      var sliceAngle = (2 * Math.PI) / sliceCount;
+      function rotateWheel() {
+        var startTime = performance.now();
+        var maxRotationTime = Math.random() * 20000;
+        var initialSpeed = maxRotationTime / 1000;
+        var decreaseSpeed = 0.001;
+        var rotationWay = Math.random() < 0.5 ? 1 : -1;
+        function update() {
+          var currentTime = performance.now();
+          var elapsedTime = currentTime - startTime;
+          var elapsedSpeed =
+            (initialSpeed - (elapsedTime * decreaseSpeed) / 2) * rotationWay;
+          if (elapsedTime < maxRotationTime) {
+            var rotationAngle =
+              elapsedSpeed * (elapsedTime / 1000) * 2 * Math.PI;
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            drawWheel(rotationAngle + new_position);
+            requestAnimationFrame(update);
+            rotated = +rotationAngle + new_position;
+          } else {
+            afterSpin(rotated);
+          }
+        }
+        update();
+      }
+      function randomPosition() {
+        new_position = Math.random() * 37;
+        rotated = 0;
+        drawWheel(new_position);
+      }
+      function resetWheel() {
+        new_position = 0;
+        rotated = 0;
+        drawWheel(0);
+      }
+      function afterSpin(rotated) {
+        new_position = +rotated;
+        var indexCalc = Math.round(Math.abs(new_position) % 37);
+        if (new_position < 0) {
+          index = indexCalc;
+          console.log(
+            numbers[index].value
+          );
+        } else {
+          index = 37 - indexCalc;
+          console.log(
+            numbers[index].value
+          );
+        }
+        winnerBox.textContent = " Winning Number: " + numbers[index].value+
+                                ",  Winning Color: " +numbers[index].color+
+                                ",  Winning Type: " +numbers[index].type;
+        winnerBox2.textContent= " Winning Half: " + numbers[index].half+
+                                ",  Winning Line: " +numbers[index].line+
+                                ",  Winning 12: " +numbers[index].part;
+        var winnerListElement = document.createElement("div");
+        winnerListElement.classList.add(numbers[index].color);
+        winnerListElement.innerHTML=numbers[index].value;
+        document.getElementById("winnerList").appendChild(winnerListElement);
+      }
+      function clearWinnerList() {
+        while (winnerList.firstChild) {
+            winnerList.removeChild(winnerList.firstChild);
+        }
+    }
+      function drawWheel(rotationAngle) {
+        for (var i = 0; i < sliceCount; i++) {
+          var startAngle = (i - 9.75 + rotationAngle) * sliceAngle;
+          var endAngle = startAngle + sliceAngle;
+          context.beginPath();
+          context.moveTo(centerX, centerY);
+          context.arc(centerX, centerY, radius, startAngle, endAngle);
+          context.closePath();
+          if (i === 0) {
+            context.fillStyle = "#008b00";
+          } else {
+            context.fillStyle = i % 2 === 0 ? "#1c1c1c" : "#ee2c2c";
+          }
+          context.fill();
+          context.lineWidth = 2;
+          context.strokeStyle = "#ffd700";
+          context.stroke();
+          var text = numbers[i].value;
+          var angle = startAngle + sliceAngle / 2;
+          var textX = centerX + radius * 0.9 * Math.cos(angle);
+          var textY = centerY + radius * 0.9 * Math.sin(angle);
+          context.save();
+          context.translate(textX, textY);
+          context.rotate(angle + Math.PI / 2);
+          context.fillStyle = "#ffffff";
+          context.font = "25px Arial";
+          context.textAlign = "center";
+          context.textBaseline = "middle";
+          context.fillText(text, 0, 0);
+          context.restore();
+        }
+        var innerRadius = radius * 0.75;
+        context.beginPath();
+        context.arc(centerX, centerY, innerRadius, 0, 2 * Math.PI);
+        context.fillStyle = "#1c1c1c";
+        context.fill();
+        context.lineWidth = 2;
+        context.strokeStyle = "#ffd700";
+        context.stroke();
+        context.font = "bold 100px Arial";
+        context.fillStyle = "#ffd700";
+        context.textAlign = "center";
+        context.textBaseline = "middle";
+        context.fillText("Denizci", centerX, centerY);
+        var triangleHeight = 20;
+        var triangleBase = 20;
+        var triangleCenterX = centerX;
+        var triangleCenterY = centerY + innerRadius - triangleHeight * 23.5;
+        context.beginPath();
+        context.moveTo(
+          triangleCenterX - triangleBase,
+          triangleCenterY + triangleHeight
+        );
+        context.lineTo(
+          triangleCenterX + triangleBase,
+          triangleCenterY + triangleHeight
+        );
+        context.lineTo(triangleCenterX, triangleCenterY - triangleHeight / 1.7);
+        context.closePath();
+        context.fillStyle = "#ffd700";
+        context.fill();
+      }
+      drawWheel(0);
+    </script>
+  </body>
+</html>
